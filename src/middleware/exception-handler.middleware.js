@@ -1,6 +1,7 @@
 const ServerErrorException = require('../exception/server-error.exception');
 const ValidationException = require('../exception/validation-failure.exception');
 const EntityNotFoundException = require('../exception/entity-not-found.exception');
+const reportError = require('../utils/error-repoprting.utils');
 /**
  * Middleware dedicated to centralizing logic related to exception handling
  * related operations.
@@ -15,7 +16,11 @@ const errorHandlerMiddleware = (ex, req, res, next)=>{
     console.log(`middleware: exception caught`);
     console.warn(ex);
     if(ex){
-        console.log(`caught exveption!`+ ex.prototype);
+        
+        // Call hook to broadcast out error event to any configured 
+        // third party exception handling services.
+     reportError(ex);
+
         if(ex instanceof ValidationException){
             console.log(`mw: validation error caught`);
             res.status(400);
